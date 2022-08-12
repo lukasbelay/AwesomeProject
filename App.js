@@ -1,28 +1,30 @@
 import { StatusBar } from "expo-status-bar";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { GLView } from "expo-gl";
+import { Renderer } from "expo-three";
+import {
+  AmbientLight,
+  SphereGeometry,
+  Fog,
+  GridHelper,
+  Mesh,
+  MeshStandardMaterial,
+  PerspectiveCamera,
+  PointLight,
+  Scene,
+  SpotLight,
+} from "three";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Pressable style={styles.button}>
-        <Text>suds</Text>
-      </Pressable>
-      <Text>sussy baka</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+const App = () => {
+  const onContextCreate = async (gl) => {
+    const scene = new scene();
+  };
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#aef",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  button: {
-    backgroundColor: "#aba",
-    width: 80,
-    alignItems: "center",
-  },
-});
+return (
+  <View>
+    <GLView onContextCreate={onContextCreate} />
+  </View>
+);
+
+export default App;

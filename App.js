@@ -1,55 +1,53 @@
-import { View as GraphicsView } from "expo-graphics";
-import ExpoTHREE, { THREE } from "expo-three";
 import React from "react";
+import { Renderer } from "expo-three";
+import { View } from "react-native";
+import { GLView } from "expo-gl";
+import {
+  Scene,
+  PerspectiveCamera,
+  BoxBufferGeometry,
+  MeshBasicMaterial,
+  Mesh,
+} from "three";
 
-export default class App extends React.Component {
-  componentWillMount() {
-    THREE.suppressExpoWarnings();
-  }
-
-  render() {
-    // Create an `ExpoGraphics.View` covering the whole screen, tell it to call our
-    // `onContextCreate` function once it's initialized.
-    return (
-      <GraphicsView
-        onContextCreate={this.onContextCreate}
-        onRender={this.onRender}
-      />
+const App = () => {
+  const onContextCreate = async (gl) => {
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(
+      75,
+      gl.drawingBufferWidth / gl.drawingBufferHeight,
+      0.1,
+      1000
     );
-  }
+    camera.position.z = 2;
+    gl.canvas = {
+      width: gl.drawingBufferWidth,
+      height: gl.drawingBufferHeight,
+    };
+    const renderer = new Renderer({ gl });
+    renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-  // This is called by the `ExpoGraphics.View` once it's initialized
-  onContextCreate = async ({
-    gl,
-    canvas,
-    width,
-    height,
-    scale: pixelRatio,
-  }) => {
-    this.renderer = new ExpoTHREE.Renderer({ gl, pixelRatio, width, height });
-    this.renderer.setClearColor(0xffffff);
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    this.camera.position.z = 5;
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const geometry = new BoxBufferGeometry(1, 1, 1);
+    const material = new MeshBasicMaterial({ color: 0xff6347 });
+    const cube = new Mesh(geometry, material);
+    scene.add(cube);
 
-    const material = new THREE.MeshPhongMaterial({
-      color: 0xff0000,
-    });
-
-    this.cube = new THREE.Mesh(geometry, material);
-    this.scene.add(this.cube);
-
-    this.scene.add(new THREE.AmbientLight(0x404040));
-
-    const light = new THREE.DirectionalLight(0xffffff, 0.5);
-    light.position.set(3, 3, 3);
-    this.scene.add(light);
+    const render = () => {
+      requestAnimationFrame(render);
+      cube.rotation.x += 0.1;
+      renderer.render(scene, camera);
+      gl.endFrameEXP();
+    };
+    render();
   };
 
-  onRender = (delta) => {
-    this.cube.rotation.x += 3.5 * delta;
-    this.cube.rotation.y += 2 * delta;
-    this.renderer.render(this.scene, this.camera);
-  };
-}
+  return (
+    <View>
+      <GLView
+        onContextCreate={onContextCreate}
+        style={{ width: 300, height: 300 }}
+      />
+    </View>
+  );
+};
+export default App;

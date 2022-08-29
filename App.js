@@ -21,7 +21,7 @@ const App = () => {
       0.1,
       1000
     );
-    camera.position.z = 5;
+    camera.position.z = 10;
     camera.position.x = 0;
     camera.position.y = 0;
     gl.canvas = {
@@ -30,22 +30,27 @@ const App = () => {
     };
     const renderer = new Renderer({ gl });
     renderer.setSize(gl.Width, gl.Height);
+    renderer.setPixelRatio(gl.devicePixelRatio);
     const pointLight = new THREE.AmbientLight(0xffffff);
     pointLight.position.set(20, 20, 20);
 
     scene.add(pointLight);
-
-    const geometry = new BoxBufferGeometry(1, 1, 1);
-    const material = new MeshBasicMaterial({ color: 0xff6447 });
-    const cube = new Mesh(geometry, material);
-    cube.position.y = 0;
-    cube.position.x = 0;
-
-    scene.add(cube);
-
+    const moonTexture = new TextureLoader().load(require("./assets/moon.jpg"));
+    let moon = new THREE.Mesh(
+      new THREE.SphereGeometry(2, 64, 32),
+      new THREE.MeshStandardMaterial({
+        map: moonTexture,
+      })
+    );
+    scene.add(moon);
+    let Clock = new THREE.Clock();
     const render = () => {
       requestAnimationFrame(render);
-      cube.rotation.x += 0.1;
+      let time = Clock.getElapsedTime();
+      moon.position.x = Math.cos(time) * 10;
+      moon.position.y = Math.sin(time) * 10;
+      moon.position.z = Math.tan(time) * 10;
+      moon.rotation.y += 0.1;
       renderer.render(scene, camera);
       gl.endFrameEXP();
     };
